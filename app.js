@@ -1,4 +1,4 @@
-// ===== БЛОК 1: Константы =====
+
 const PASSWORD_KEY = "wallet_password";
 const CATEGORIES_KEY = "wallet_categories";
 const OPERATIONS_KEY = "wallet_operations";
@@ -8,7 +8,7 @@ const MONTHS = ["Январь", "Февраль", "Март", "Апрель", "�
     "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
 
-// ===== БЛОК 2: Работа с localStorage =====
+
 function loadList(key, defaultList) {
     const saved = localStorage.getItem(key);
     if (saved === null) {
@@ -27,7 +27,7 @@ function getPassword() {
 }
 
 
-// ===== БЛОК 3: Вспомогательные функции =====
+
 function formatMoney(number) {
     const text = String(number);
     return text.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
@@ -88,8 +88,13 @@ function addRow(tbody, texts, classes) {
         if (classes && classes[index]) {
             td.className = classes[index];
         }
+        tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+    return tr;
+}
 
-        function setHead(thead, titles) {
+function setHead(thead, titles) {
     thead.innerHTML = "";
     const tr = document.createElement("tr");
     titles.forEach(function (title) {
@@ -100,14 +105,7 @@ function addRow(tbody, texts, classes) {
     thead.appendChild(tr);
 }
 
-        tr.appendChild(td);
-    });
-    tbody.appendChild(tr);
-    return tr;
-}
 
-
-// ===== БЛОК 4: Элементы страницы =====
 const loginScreen = document.getElementById("login-screen");
 const mainScreen = document.getElementById("main-screen");
 const loginForm = document.getElementById("login-form");
@@ -144,11 +142,12 @@ const tipsList = document.getElementById("tips-list");
 const historyBody = document.getElementById("history-body");
 
 
-// ===== БЛОК 5: Данные =====
+
 let categories = loadList(CATEGORIES_KEY, DEFAULT_CATEGORIES);
 let operations = loadList(OPERATIONS_KEY, []);
 
-// ===== БЛОК 6: Вход и выход =====
+
+
 loginForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -169,7 +168,7 @@ logoutBtn.addEventListener("click", function () {
 });
 
 
-// ===== БЛОК 7: Категории =====
+
 function renderCategories() {
     categoryList.innerHTML = "";
     categories.forEach(function (category) {
@@ -228,7 +227,7 @@ categoryForm.addEventListener("submit", function (event) {
 });
 
 
-// ===== БЛОК 8: Добавление операций =====
+
 opAmount.addEventListener("input", function () {
     const cleaned = opAmount.value.replace(/\D/g, "");
     if (cleaned !== opAmount.value) {
@@ -298,7 +297,7 @@ function deleteOperation(id) {
 }
 
 
-// ===== БЛОК 9: Баланс =====
+
 function renderBalance() {
     let income = 0;
     let expense = 0;
@@ -324,7 +323,7 @@ function renderBalance() {
 }
 
 
-// ===== БЛОК 10: История операций =====
+
 function renderHistory() {
     historyBody.innerHTML = "";
 
@@ -361,7 +360,8 @@ function renderHistory() {
     });
 }
 
-// ===== БЛОК 11: Статистика =====
+
+
 function renderStats() {
     statsHead.innerHTML = "";
     statsBody.innerHTML = "";
@@ -449,7 +449,8 @@ function renderCategoryStats() {
 
 statsMode.addEventListener("change", renderStats);
 
-// ===== БЛОК 12: Рекомендации =====
+
+
 function renderTips() {
     tipsList.innerHTML = "";
     const tips = [];
@@ -521,7 +522,8 @@ function renderTips() {
     });
 }
 
-// ===== БЛОК 13: Смена пароля =====
+
+
 passwordForm.addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -549,7 +551,8 @@ passwordForm.addEventListener("submit", function (event) {
     showMessage(passwordMessage, "Пароль изменён. Используйте его при следующем входе", true);
 });
 
-// ===== БЛОК 14: Запуск =====
+
+
 function renderData() {
     renderBalance();
     renderHistory();
