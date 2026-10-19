@@ -153,3 +153,32 @@ button:active {
 .top button:hover {
     background: #555;
 }
+
+.card {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.balance-label {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.balance-value {
+    margin: 4px 0 8px;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.balance-value.minus {
+    color: #c0392b;
+}
+
+.balance-sub {
+    margin: 2px 0;
+    font-size: 14px;
+}
