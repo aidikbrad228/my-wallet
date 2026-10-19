@@ -132,6 +132,11 @@ const categoryInput = document.getElementById("category-input");
 const categoryError = document.getElementById("category-error");
 const categoryList = document.getElementById("category-list");
 
+const passwordForm = document.getElementById("password-form");
+const newPassword = document.getElementById("new-password");
+const repeatPassword = document.getElementById("repeat-password");
+const passwordMessage = document.getElementById("password-message");
+
 const statsMode = document.getElementById("stats-mode");
 const statsHead = document.getElementById("stats-head");
 const statsBody = document.getElementById("stats-body");
@@ -515,6 +520,34 @@ function renderTips() {
         tipsList.appendChild(li);
     });
 }
+
+// ===== БЛОК 13: Смена пароля =====
+passwordForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    if (newPassword.value === "") {
+        showMessage(passwordMessage, "Введите новый пароль", false);
+        shake(newPassword);
+        return;
+    }
+
+    if (newPassword.value.length < 4) {
+        showMessage(passwordMessage, "Пароль должен быть не короче 4 символов", false);
+        shake(newPassword);
+        return;
+    }
+
+    if (newPassword.value !== repeatPassword.value) {
+        showMessage(passwordMessage, "Пароли не совпадают", false);
+        shake(repeatPassword);
+        return;
+    }
+
+    localStorage.setItem(PASSWORD_KEY, newPassword.value);
+    newPassword.value = "";
+    repeatPassword.value = "";
+    showMessage(passwordMessage, "Пароль изменён. Используйте его при следующем входе", true);
+});
 
 // ===== БЛОК 14: Запуск =====
 function renderData() {
