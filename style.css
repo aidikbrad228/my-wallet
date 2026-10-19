@@ -182,3 +182,23 @@ button:active {
     margin: 2px 0;
     font-size: 14px;
 }
+
+.columns {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.column {
+    flex: 1;
+    min-width: 0;
+}
+
+ul {
+    margin: 10px 0 0;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 6px;
+}

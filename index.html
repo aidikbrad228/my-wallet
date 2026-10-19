@@ -31,6 +31,21 @@
             <p class="balance-sub">Доходы: <span id="total-income">0 ₽</span></p>
             <p class="balance-sub">Расходы: <span id="total-expense">0 ₽</span></p>
         </section>
+        
+        <div class="columns">
+            <div class="column">
+                <section class="card">
+                    <h2>Категории расходов</h2>
+                    <form id="category-form">
+                        <label for="category-input">Название новой категории</label>
+                        <input type="text" id="category-input" autocomplete="off">
+                        <button type="submit">Добавить категорию</button>
+                    </form>
+                    <p id="category-error" class="error"></p>
+                    <ul id="category-list"></ul>
+                </section>
+            </div>
+        </div>
     </div>
 
     <script src="app.js" defer></script>
