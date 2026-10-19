@@ -1,0 +1,155 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 16px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    color: #222;
+    background: #f0f2f5;
+}
+
+h1 {
+    margin: 0 0 16px;
+    font-size: 28px;
+}
+
+h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+}
+
+label {
+    display: block;
+    margin: 10px 0 4px;
+    font-size: 14px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #2f6fed;
+    box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.2);
+}
+
+button {
+    margin-top: 14px;
+    padding: 10px 16px;
+    font-size: 16px;
+    color: #fff;
+    background: #2f6fed;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+button:hover {
+    background: #1f57c7;
+}
+
+button:active {
+    transform: scale(0.96);
+}
+
+.error {
+    min-height: 20px;
+    margin: 8px 0 0;
+    font-size: 14px;
+    color: #c0392b;
+}
+
+.error.ok {
+    color: #1e8449;
+}
+
+.shake {
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    50% {
+        transform: translateX(6px);
+    }
+
+    75% {
+        transform: translateX(-6px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.login-box {
+    max-width: 360px;
+    margin: 80px auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    animation: appear 0.4s;
+}
+
+.login-box button {
+    width: 100%;
+}
+
+#main-screen {
+    max-width: 1100px;
+    margin: 0 auto;
+    animation: appear 0.4s;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.top h1 {
+    margin: 0;
+}
+
+.top button {
+    margin: 0;
+    background: #777;
+}
+
+.top button:hover {
+    background: #555;
+}
