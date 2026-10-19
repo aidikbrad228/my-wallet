@@ -35,6 +35,30 @@
         <div class="columns">
             <div class="column">
                 <section class="card">
+                                    <section class="card">
+                    <h2>Новая операция</h2>
+                    <form id="operation-form">
+                        <label for="op-type">Тип</label>
+                        <select id="op-type">
+                            <option value="expense">Расход</option>
+                            <option value="income">Доход</option>
+                        </select>
+
+                        <label for="op-amount">Сумма, ₽</label>
+                        <input type="text" id="op-amount" inputmode="numeric" maxlength="9" autocomplete="off">
+
+                        <div id="op-category-box">
+                            <label for="op-category">Категория</label>
+                            <select id="op-category"></select>
+                        </div>
+
+                        <label for="op-date">Дата</label>
+                        <input type="date" id="op-date">
+
+                        <button type="submit">Добавить</button>
+                    </form>
+                    <p id="op-error" class="error"></p>
+                </section>
                     <h2>Категории расходов</h2>
                     <form id="category-form">
                         <label for="category-input">Название новой категории</label>

@@ -24,6 +24,12 @@ function getPassword() {
 
 // ===== БЛОК 3: Вспомогательные функции =====
 function shake(element) {
+    function pad(number) {
+    return number < 10 ? "0" + number : String(number);
+}
+function dateToKey(date) {
+    return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+}
     function formatMoney(number) {
     const text = String(number);
     return text.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
@@ -48,6 +54,13 @@ const logoutBtn = document.getElementById("logout-btn");
 const balanceEl = document.getElementById("balance");
 const totalIncomeEl = document.getElementById("total-income");
 const totalExpenseEl = document.getElementById("total-expense");
+const operationForm = document.getElementById("operation-form");
+const opType = document.getElementById("op-type");
+const opAmount = document.getElementById("op-amount");
+const opCategoryBox = document.getElementById("op-category-box");
+const opCategory = document.getElementById("op-category");
+const opDate = document.getElementById("op-date");
+const opError = document.getElementById("op-error");
 const categoryForm = document.getElementById("category-form");
 const categoryInput = document.getElementById("category-input");
 const categoryError = document.getElementById("category-error");
@@ -79,6 +92,15 @@ logoutBtn.addEventListener("click", function () {
 
 // ===== БЛОК 7: Категории =====
 function renderCategories() {
+    function renderCategorySelect() {
+    opCategory.innerHTML = "";
+    categories.forEach(function (category) {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        opCategory.appendChild(option);
+    });
+}
     categoryList.innerHTML = "";
     categories.forEach(function (category) {
         const li = document.createElement("li");
@@ -119,9 +141,71 @@ categoryForm.addEventListener("submit", function (event) {
     categories.push(name);
     saveList(CATEGORIES_KEY, categories);
     renderCategories();
+    renderCategorySelect();
 
     categoryInput.value = "";
     showMessage(categoryError, "Категория добавлена", true);
+});
+
+// ===== БЛОК 8: Добавление операций =====
+opAmount.addEventListener("input", function () {
+    const cleaned = opAmount.value.replace(/\D/g, "");
+    if (cleaned !== opAmount.value) {
+        opAmount.value = cleaned;
+        showMessage(opError, "В поле суммы можно вводить только цифры", false);
+        shake(opAmount);
+    }
+});
+
+opType.addEventListener("change", function () {
+    opCategoryBox.hidden = opType.value === "income";
+});
+
+operationForm.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    if (opAmount.value === "") {
+        showMessage(opError, "Введите сумму", false);
+        shake(opAmount);
+        return;
+    }
+
+    const amount = Number(opAmount.value);
+    if (amount === 0) {
+        showMessage(opError, "Сумма должна быть больше нуля", false);
+        shake(opAmount);
+        return;
+    }
+
+    if (opDate.value === "") {
+        showMessage(opError, "Выберите дату", false);
+        shake(opDate);
+        return;
+    }
+
+    let category = "";
+    if (opType.value === "expense") {
+        category = opCategory.value;
+        if (category === "") {
+            showMessage(opError, "Выберите категорию", false);
+            return;
+        }
+    }
+
+    const operation = {
+        id: Date.now(),
+        type: opType.value,
+        amount: amount,
+        category: category,
+        date: opDate.value
+    };
+
+    operations.push(operation);
+    saveList(OPERATIONS_KEY, operations);
+    renderData();
+
+    opAmount.value = "";
+    showMessage(opError, "Операция добавлена", true);
 });
 
 // ===== БЛОК 9: Баланс =====
@@ -155,5 +239,7 @@ function renderData() {
     renderBalance();
 }
 
+opDate.value = dateToKey(new Date());
 renderCategories();
+renderCategorySelect();
 renderData();
