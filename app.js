@@ -4,6 +4,8 @@ const CATEGORIES_KEY = "wallet_categories";
 const OPERATIONS_KEY = "wallet_operations";
 const DEFAULT_PASSWORD = "0000";
 const DEFAULT_CATEGORIES = ["Еда", "Транспорт", "Развлечения"];
+const MONTHS = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
 
 // ===== БЛОК 2: Работа с localStorage =====
@@ -39,9 +41,31 @@ function dateToKey(date) {
     return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
 }
 
+function keyToDate(key) {
+    const parts = key.split("-");
+    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+}
+
 function formatDate(key) {
     const parts = key.split("-");
     return parts[2] + "." + parts[1] + "." + parts[0];
+}
+
+function getWeekStart(key) {
+    const date = keyToDate(key);
+    const shift = (date.getDay() + 6) % 7;
+    date.setDate(date.getDate() - shift);
+    return dateToKey(date);
+}
+function getWeekEnd(startKey) {
+    const date = keyToDate(startKey);
+    date.setDate(date.getDate() + 6);
+    return dateToKey(date);
+}
+
+function formatMonth(monthKey) {
+    const parts = monthKey.split("-");
+    return MONTHS[Number(parts[1]) - 1] + " " + parts[0];
 }
 
 function shake(element) {
@@ -64,6 +88,18 @@ function addRow(tbody, texts, classes) {
         if (classes && classes[index]) {
             td.className = classes[index];
         }
+
+        function setHead(thead, titles) {
+    thead.innerHTML = "";
+    const tr = document.createElement("tr");
+    titles.forEach(function (title) {
+        const th = document.createElement("th");
+        th.textContent = title;
+        tr.appendChild(th);
+    });
+    thead.appendChild(tr);
+}
+
         tr.appendChild(td);
     });
     tbody.appendChild(tr);
@@ -96,6 +132,9 @@ const categoryInput = document.getElementById("category-input");
 const categoryError = document.getElementById("category-error");
 const categoryList = document.getElementById("category-list");
 
+const statsMode = document.getElementById("stats-mode");
+const statsHead = document.getElementById("stats-head");
+const statsBody = document.getElementById("stats-body");
 const historyBody = document.getElementById("history-body");
 
 
@@ -316,11 +355,99 @@ function renderHistory() {
     });
 }
 
+// ===== БЛОК 11: Статистика =====
+function renderStats() {
+    statsHead.innerHTML = "";
+    statsBody.innerHTML = "";
+
+    if (operations.length === 0) {
+        setHead(statsHead, ["Данные"]);
+        addRow(statsBody, ["Операций пока нет"]);
+        return;
+    }
+
+    if (statsMode.value === "category") {
+        renderCategoryStats();
+    } else {
+        renderPeriodStats(statsMode.value);
+    }
+}
+
+function renderPeriodStats(mode) {
+    setHead(statsHead, ["Период", "Доходы", "Расходы"]);
+
+    const groups = {};
+
+    operations.forEach(function (operation) {
+        let key = operation.date;
+        if (mode === "week") {
+            key = getWeekStart(operation.date);
+        } else if (mode === "month") {
+            key = operation.date.slice(0, 7);
+        }
+
+        if (!groups[key]) {
+            groups[key] = { income: 0, expense: 0 };
+        }
+        groups[key][operation.type] += operation.amount;
+    });
+
+    const keys = Object.keys(groups).sort().reverse();
+
+    keys.forEach(function (key) {
+        let label = formatDate(key);
+        if (mode === "week") {
+            label = formatDate(key) + " – " + formatDate(getWeekEnd(key));
+        } else if (mode === "month") {
+            label = formatMonth(key);
+        }
+        addRow(statsBody, [
+            label,
+            formatMoney(groups[key].income),
+            formatMoney(groups[key].expense)
+        ], ["", "income money", "expense money"]);
+    });
+}
+
+function renderCategoryStats() {
+    setHead(statsHead, ["Категория", "Расходы", "Доля"]);
+
+    const totals = {};
+    let totalExpense = 0;
+
+    operations.forEach(function (operation) {
+        if (operation.type === "expense") {
+            if (!totals[operation.category]) {
+                totals[operation.category] = 0;
+            }
+            totals[operation.category] += operation.amount;
+            totalExpense += operation.amount;
+        }
+    });
+
+    const names = Object.keys(totals).sort(function (a, b) {
+        return totals[b] - totals[a];
+    });
+
+    if (names.length === 0) {
+        addRow(statsBody, ["Расходов пока нет", "", ""]);
+        return;
+    }
+
+    names.forEach(function (name) {
+        const share = Math.round(totals[name] / totalExpense * 100);
+        addRow(statsBody, [name, formatMoney(totals[name]), share + "%"],
+            ["", "expense money", ""]);
+    });
+}
+
+statsMode.addEventListener("change", renderStats);
 
 // ===== БЛОК 14: Запуск =====
 function renderData() {
     renderBalance();
     renderHistory();
+    renderStats();
 }
 
 opDate.value = dateToKey(new Date());

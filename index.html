@@ -73,6 +73,22 @@
             </div>
 
             <div class="column">
+                                <section class="card">
+                    <h2>Статистика</h2>
+                    <label for="stats-mode">Показать</label>
+                    <select id="stats-mode">
+                        <option value="day">По дням</option>
+                        <option value="week">По неделям</option>
+                        <option value="month">По месяцам</option>
+                        <option value="category">По категориям</option>
+                    </select>
+                    <div class="table-wrap">
+                        <table>
+                            <thead id="stats-head"></thead>
+                            <tbody id="stats-body"></tbody>
+                        </table>
+                    </div>
+                </section>
                 <section class="card">
                     <h2>История операций</h2>
                     <div class="table-wrap scroll">
