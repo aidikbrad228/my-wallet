@@ -5,14 +5,16 @@ const OPERATIONS_KEY = "wallet_operations";
 const DEFAULT_PASSWORD = "0000";
 const DEFAULT_CATEGORIES = ["Еда", "Транспорт", "Развлечения"];
 
+
 // ===== БЛОК 2: Работа с localStorage =====
 function loadList(key, defaultList) {
     const saved = localStorage.getItem(key);
     if (saved === null) {
-        return defaultList.slice(); 
-        return JSON.parse(saved);
+        return defaultList.slice();
     }
+    return JSON.parse(saved);
 }
+
 function saveList(key, list) {
     localStorage.setItem(key, JSON.stringify(list));
 }
@@ -22,27 +24,52 @@ function getPassword() {
     return savedPassword || DEFAULT_PASSWORD;
 }
 
+
 // ===== БЛОК 3: Вспомогательные функции =====
-function shake(element) {
-    function pad(number) {
-    return number < 10 ? "0" + number : String(number);
-}
-function dateToKey(date) {
-    return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
-}
-    function formatMoney(number) {
+function formatMoney(number) {
     const text = String(number);
     return text.replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
 }
-function showMessage(element, text, isOk) {
-    element.textContent = text;
-    element.className = isOk ? "error ok" : "error";
+
+function pad(number) {
+    return number < 10 ? "0" + number : String(number);
 }
+
+function dateToKey(date) {
+    return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+}
+
+function formatDate(key) {
+    const parts = key.split("-");
+    return parts[2] + "." + parts[1] + "." + parts[0];
+}
+
+function shake(element) {
     element.classList.add("shake");
     setTimeout(function () {
         element.classList.remove("shake");
     }, 300);
 }
+
+function showMessage(element, text, isOk) {
+    element.textContent = text;
+    element.className = isOk ? "error ok" : "error";
+}
+
+function addRow(tbody, texts, classes) {
+    const tr = document.createElement("tr");
+    texts.forEach(function (text, index) {
+        const td = document.createElement("td");
+        td.textContent = text;
+        if (classes && classes[index]) {
+            td.className = classes[index];
+        }
+        tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+    return tr;
+}
+
 
 // ===== БЛОК 4: Элементы страницы =====
 const loginScreen = document.getElementById("login-screen");
@@ -51,9 +78,11 @@ const loginForm = document.getElementById("login-form");
 const passwordInput = document.getElementById("password-input");
 const loginError = document.getElementById("login-error");
 const logoutBtn = document.getElementById("logout-btn");
+
 const balanceEl = document.getElementById("balance");
 const totalIncomeEl = document.getElementById("total-income");
 const totalExpenseEl = document.getElementById("total-expense");
+
 const operationForm = document.getElementById("operation-form");
 const opType = document.getElementById("op-type");
 const opAmount = document.getElementById("op-amount");
@@ -61,10 +90,14 @@ const opCategoryBox = document.getElementById("op-category-box");
 const opCategory = document.getElementById("op-category");
 const opDate = document.getElementById("op-date");
 const opError = document.getElementById("op-error");
+
 const categoryForm = document.getElementById("category-form");
 const categoryInput = document.getElementById("category-input");
 const categoryError = document.getElementById("category-error");
 const categoryList = document.getElementById("category-list");
+
+const historyBody = document.getElementById("history-body");
+
 
 // ===== БЛОК 5: Данные =====
 let categories = loadList(CATEGORIES_KEY, DEFAULT_CATEGORIES);
@@ -90,22 +123,24 @@ logoutBtn.addEventListener("click", function () {
     loginScreen.hidden = false;
 });
 
+
 // ===== БЛОК 7: Категории =====
 function renderCategories() {
-    function renderCategorySelect() {
+    categoryList.innerHTML = "";
+    categories.forEach(function (category) {
+        const li = document.createElement("li");
+        li.textContent = category;
+        categoryList.appendChild(li);
+    });
+}
+
+function renderCategorySelect() {
     opCategory.innerHTML = "";
     categories.forEach(function (category) {
         const option = document.createElement("option");
         option.value = category;
         option.textContent = category;
         opCategory.appendChild(option);
-    });
-}
-    categoryList.innerHTML = "";
-    categories.forEach(function (category) {
-        const li = document.createElement("li");
-        li.textContent = category;
-        categoryList.appendChild(li);
     });
 }
 
@@ -146,6 +181,7 @@ categoryForm.addEventListener("submit", function (event) {
     categoryInput.value = "";
     showMessage(categoryError, "Категория добавлена", true);
 });
+
 
 // ===== БЛОК 8: Добавление операций =====
 opAmount.addEventListener("input", function () {
@@ -208,6 +244,15 @@ operationForm.addEventListener("submit", function (event) {
     showMessage(opError, "Операция добавлена", true);
 });
 
+function deleteOperation(id) {
+    operations = operations.filter(function (operation) {
+        return operation.id !== id;
+    });
+    saveList(OPERATIONS_KEY, operations);
+    renderData();
+}
+
+
 // ===== БЛОК 9: Баланс =====
 function renderBalance() {
     let income = 0;
@@ -233,10 +278,49 @@ function renderBalance() {
     }
 }
 
+
+// ===== БЛОК 10: История операций =====
+function renderHistory() {
+    historyBody.innerHTML = "";
+
+    if (operations.length === 0) {
+        addRow(historyBody, ["Операций пока нет", "", "", ""]);
+        return;
+    }
+
+    const sorted = operations.slice().sort(function (a, b) {
+        if (a.date !== b.date) {
+            return a.date < b.date ? 1 : -1;
+        }
+        return b.id - a.id;
+    });
+
+    sorted.forEach(function (operation) {
+        const isIncome = operation.type === "income";
+        const sign = isIncome ? "+" : "−";
+        const tr = addRow(historyBody, [
+            formatDate(operation.date),
+            isIncome ? "Доход" : operation.category,
+            sign + formatMoney(operation.amount),
+            ""
+        ], ["", "", (isIncome ? "income" : "expense") + " money", ""]);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "delete-btn";
+        button.textContent = "Удалить";
+        button.addEventListener("click", function () {
+            deleteOperation(operation.id);
+        });
+        tr.lastChild.appendChild(button);
+    });
+}
+
+
 // ===== БЛОК 14: Запуск =====
-// Перерисовать всё, что зависит от списка операций
 function renderData() {
     renderBalance();
+    renderHistory();
 }
 
 opDate.value = dateToKey(new Date());

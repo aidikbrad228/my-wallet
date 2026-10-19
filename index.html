@@ -25,17 +25,17 @@
             <h1>Мой кошелёк</h1>
             <button id="logout-btn" type="button">Выйти</button>
         </header>
+
         <section class="card balance">
             <p class="balance-label">Текущий баланс</p>
             <p id="balance" class="balance-value">0 ₽</p>
             <p class="balance-sub">Доходы: <span id="total-income">0 ₽</span></p>
             <p class="balance-sub">Расходы: <span id="total-expense">0 ₽</span></p>
         </section>
-        
+
         <div class="columns">
             <div class="column">
                 <section class="card">
-                                    <section class="card">
                     <h2>Новая операция</h2>
                     <form id="operation-form">
                         <label for="op-type">Тип</label>
@@ -59,6 +59,8 @@
                     </form>
                     <p id="op-error" class="error"></p>
                 </section>
+
+                <section class="card">
                     <h2>Категории расходов</h2>
                     <form id="category-form">
                         <label for="category-input">Название новой категории</label>
@@ -68,6 +70,28 @@
                     <p id="category-error" class="error"></p>
                     <ul id="category-list"></ul>
                 </section>
+            </div>
+
+            <div class="column">
+                <section class="card">
+                    <h2>История операций</h2>
+                    <div class="table-wrap scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Категория</th>
+                                    <th>Сумма</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
             </div>
         </div>
     </div>
