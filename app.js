@@ -135,6 +135,7 @@ const categoryList = document.getElementById("category-list");
 const statsMode = document.getElementById("stats-mode");
 const statsHead = document.getElementById("stats-head");
 const statsBody = document.getElementById("stats-body");
+const tipsList = document.getElementById("tips-list");
 const historyBody = document.getElementById("history-body");
 
 
@@ -443,11 +444,84 @@ function renderCategoryStats() {
 
 statsMode.addEventListener("change", renderStats);
 
+// ===== БЛОК 12: Рекомендации =====
+function renderTips() {
+    tipsList.innerHTML = "";
+    const tips = [];
+
+    let income = 0;
+    let expense = 0;
+    const byCategory = {};
+    const byMonth = {};
+
+    operations.forEach(function (operation) {
+        if (operation.type === "income") {
+            income += operation.amount;
+        } else {
+            expense += operation.amount;
+            byCategory[operation.category] = (byCategory[operation.category] || 0) + operation.amount;
+            const month = operation.date.slice(0, 7);
+            byMonth[month] = (byMonth[month] || 0) + operation.amount;
+        }
+    });
+
+    if (expense === 0) {
+        tips.push("Добавьте свои расходы, и здесь появятся рекомендации.");
+    } else {
+
+        if (expense > income) {
+            tips.push("Расходы больше доходов на " + formatMoney(expense - income) +
+                ". Постарайтесь сократить необязательные траты.");
+        }
+
+        let topName = "";
+        let topSum = 0;
+        Object.keys(byCategory).forEach(function (name) {
+            if (byCategory[name] > topSum) {
+                topSum = byCategory[name];
+                topName = name;
+            }
+        });
+        const share = Math.round(topSum / expense * 100);
+        if (share >= 40) {
+            tips.push("Больше всего вы тратите на «" + topName + "» — " + share +
+                "% всех расходов. Попробуйте сократить эту статью.");
+        }
+
+        if (income > 0 && expense <= income && (income - expense) / income < 0.1) {
+            tips.push("Вы откладываете меньше 10% дохода. Старайтесь сохранять хотя бы десятую часть.");
+        }
+
+        const now = new Date();
+        const thisMonth = dateToKey(now).slice(0, 7);
+        const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const prevMonth = dateToKey(prevDate).slice(0, 7);
+        const thisSum = byMonth[thisMonth] || 0;
+        const prevSum = byMonth[prevMonth] || 0;
+        if (prevSum > 0 && thisSum > prevSum * 1.2) {
+            const growth = Math.round((thisSum - prevSum) / prevSum * 100);
+            tips.push("В этом месяце расходы выросли на " + growth +
+                "% по сравнению с прошлым. Проверьте, на что ушли деньги.");
+        }
+
+        if (tips.length === 0) {
+            tips.push("Так держать! Расходы под контролем.");
+        }
+    }
+
+    tips.forEach(function (text) {
+        const li = document.createElement("li");
+        li.textContent = text;
+        tipsList.appendChild(li);
+    });
+}
+
 // ===== БЛОК 14: Запуск =====
 function renderData() {
     renderBalance();
     renderHistory();
     renderStats();
+    renderTips();
 }
 
 opDate.value = dateToKey(new Date());
